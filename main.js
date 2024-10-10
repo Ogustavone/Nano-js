@@ -7,19 +7,22 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // Importar comandos
 const fs = require('node:fs');
 const path = require('node:path');
-const commandsPath = path.join(__dirname, 'comandos');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-
 client.commands = new Collection();
-for (const file of commandFiles) {
-  const filePath = path.join(commandsPath, file);
-  const commands = require(filePath);
-  if ('data' in commands && 'execute' in commands) {
-    client.commands.set(commands.data.name, commands);
-  } else {
-    console.log(`Arquivo ${file} necessita de uma propriedade 'data' e 'execute'`);
-  };
-};
+
+// Passando pelos diretórios e cada arquivo .js
+fs.readdirSync('./comandos').forEach(dir => { 
+  const commandsPath = path.join(__dirname, 'comandos', dir);
+  const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    // Adicionando os comandos
+    for (const file of commandFiles) {
+      const filePath = path.join(commandsPath, file);
+      const commands = require(filePath);
+      if ('data' in commands && 'execute' in commands) {
+        client.commands.set(commands.data.name, commands);
+      } else {
+        console.log(`Arquivo ${file} necessita de uma propriedade 'data' e 'execute'`)};
+    };
+});
 
 // Inicialização e login do bot
 client.once(Events.ClientReady, botClient => {
