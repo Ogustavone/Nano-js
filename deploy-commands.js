@@ -20,11 +20,11 @@ const rest = new REST({ version: '10' }).setToken(token);
 // Deploy comandos
 (async () => {
   try {
-    console.log(`Iniciando deploy de ${commands.length} comandos...`);
+    console.log(`Iniciando deploy de ${commandsList.length} comandos...`);
     
     const data = await rest.put(
       Routes.applicationGuildCommands(clientId, guildId),
-      { body: commands },
+      { body: commandsList },
     );
     
     console.log(`Comandos registrados! ${data.length} comandos registrados.`);
