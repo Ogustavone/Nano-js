@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Client } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -7,8 +7,10 @@ module.exports = {
   
   async execute(interaction) {
     const msg = await interaction.reply({ content: ":ping_pong: **Pong!**", fetchReply: true });
+    const latency = msg.createdTimestamp - interaction.createdTimestamp;
+    const api_latency = interaction.client.ws.ping;
     await interaction.editReply(
-      `:ping_pong: **Pong!**\n\`Latência: ${msg.createdTimestamp - interaction.createdTimestamp}ms | API: ${interaction.client.ws.ping}ms\``
+      `:ping_pong: **Pong!**\n\`Latência: ${latency}ms | API: ${api_latency}ms\``
     );
   }
 };
