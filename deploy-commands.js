@@ -1,4 +1,4 @@
-const { REST, Routes } = require('discord.js');
+const { REST, Routes, SlashCommandBuilder } = require('discord.js');
 const { token, clientId, guildId } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -10,7 +10,11 @@ fs.readdirSync('./comandos').forEach(dir => {
   const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
   for (const file of commandFiles) {
     const command = require(`./comandos/${dir}/${file}`);
-    commandsList.push(command.data.toJSON());
+    if (command.data instanceof SlashCommandBuilder) {
+      commandsList.push(command.data.toJSON());
+    } else {
+      commandsList.push(command.data);
+    }
   };
 });
 
@@ -22,12 +26,13 @@ const rest = new REST({ version: '10' }).setToken(token);
   try {
     console.log(`Iniciando deploy de ${commandsList.length} comandos...`);
     
-    const data = await rest.put(
-      Routes.applicationGuildCommands(clientId, guildId),
-      { body: commandsList },
-    );
-    
-    console.log(`Comandos registrados! ${data.length} comandos registrados.`);
+    for (const guild of guildId) {
+      const data = await rest.put(
+        Routes.applicationGuildCommands(clientId, guild),
+        { body: commandsList }
+      );
+      console.log(`Deploy finalizado! ${data.length} comandos registrados no servidor ${guild}.`)
+    };
   } catch (error) {
     console.error(error);
   };
