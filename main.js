@@ -1,12 +1,15 @@
 const { Client, Events, GatewayIntentBits, Collection } = require('discord.js');
 const { token } = require('./config.json');
+const listeners = require('./listeners.js');
 
 // Cliente do bot
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildPresences
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
   ]
 });
 
@@ -35,6 +38,8 @@ client.once(Events.ClientReady, botClient => {
   console.log(`Login feito como ${botClient.user.tag}`);
 });
 client.login(token);
+
+listeners.runListeners(client);
 
 // Listener de interações
 client.on(Events.InteractionCreate, async interaction => {
